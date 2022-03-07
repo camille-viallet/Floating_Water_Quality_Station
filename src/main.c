@@ -24,24 +24,21 @@ static sx126x_t sx126x;
 /* Declare globally the loramac descriptor */
 static semtech_loramac_t loramac;
 
-/* Declare globally the sensor device descriptor */
-//static hts221_t hts221;
-
 /* TODO: Declare globally Cayenne LPP descriptor here */
 static cayenne_lpp_t lpp;
 
 /* Device and application informations required for OTAA activation */
 // Camille TTN
-/*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};                                                 
-static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};                                                 
-static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C}; 
-*/
+static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
+static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
+static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C};
 
+/*
 // Camille Helium
 static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x60, 0x81,0xF9,0x6C,0x47,0xF9,0xA7,0xD3};                                                 //Camille
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x60,0x81,0xF9,0x45,0x86,0x89,0x57,0xBB};                                                 //Camille
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0xB8,0x53,0xCA,0xC4,0x29,0x03,0x23,0x9F,0xDF,0x24,0x39,0x30,0x20,0x79,0x30,0xC8}; //Camille
-
+*/
 static void sender(void)
 {
     while (1)
@@ -52,24 +49,24 @@ static void sender(void)
         /* do some measurements */
         uint16_t humidity = 20;
         int16_t temperature = 0;
-        /* if (hts221_read_humidity(&hts221, &humidity) != HTS221_OK) {
-            puts(" -- failed to read humidity!");
-        }
-        if (hts221_read_temperature(&hts221, &temperature) != HTS221_OK) {
-            puts(" -- failed to read temperature!");
-        }*/
 
         /* TODO: prepare cayenne lpp payload here */
-        cayenne_lpp_add_temperature(&lpp, 0, (float)temperature / 10);
-        cayenne_lpp_add_relative_humidity(&lpp, 1, (float)humidity / 10);
-
-        printf("Sending LPP data\n");
+        cayenne_lpp_add_temperature(&lpp, 0, (float)temperature);
+        cayenne_lpp_add_relative_humidity(&lpp, 1, (float)humidity);
 
         /* send the LoRaWAN message */
         uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
-        if (ret != SEMTECH_LORAMAC_TX_DONE)
+        if (ret == SEMTECH_LORAMAC_TX_DONE)
         {
-            printf("Cannot send lpp message, ret code: %d\n", ret);
+            printf("Send Data OK");
+        }
+        else if (ret == SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED)
+        {
+            printf("Duty Cycle Restriction");
+        }
+        else if (ret == SEMTECH_LORAMAC_TX_ERROR )
+        {
+            printf("Invalid Parameter given");
         }
 
         /* TODO: clear buffer once done here */
@@ -82,18 +79,6 @@ static void sender(void)
 
 int main(void)
 {
-    /*if (hts221_init(&hts221, &hts221_params[0]) != HTS221_OK) {
-        puts("Sensor initialization failed");
-        return 1;
-    }
-    if (hts221_power_on(&hts221) != HTS221_OK) {
-        puts("Sensor initialization power on failed");
-        return 1;
-    }
-    if (hts221_set_rate(&hts221, hts221.p.rate) != HTS221_OK) {
-        puts("Sensor continuous mode setup failed");
-        return 1;
-    }*/
 
     /* initialize the radio driver */
     sx126x_setup(&sx126x, &sx126x_params[0], 0);
@@ -125,7 +110,8 @@ int main(void)
     else if (state == SEMTECH_LORAMAC_BUSY)
     {
         puts("In progress");
-    }else if (state == SEMTECH_LORAMAC_JOIN_FAILED)
+    }
+    else if (state == SEMTECH_LORAMAC_JOIN_FAILED)
     {
         puts("Join Failed");
         return 1;
