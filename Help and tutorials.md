@@ -85,3 +85,7 @@ Cayenne : https://github.com/RIOT-OS/RIOT/tree/master/pkg/cayenne-lpp
 # Help with building the raft
 
 Example of a raft similar to the one to be built: https://nevonprojects.com/iot-water-pollution-monitor-rc-boat/
+
+# Creation of new drivers for RIOT os
+
+https://github-wiki-see.page/m/RIOT-OS/RIOT/wiki/Guide%3A-Writing-a-device-driver-in-RIOT
