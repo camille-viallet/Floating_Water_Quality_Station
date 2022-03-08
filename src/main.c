@@ -58,7 +58,7 @@ static void sender(void)
         uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
         if (ret == SEMTECH_LORAMAC_TX_DONE)
         {
-            printf("Send Data OK");
+            printf("Send Data");
         }
         else if (ret == SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED)
         {
