@@ -10,13 +10,17 @@
 #include "net/loramac.h"
 #include "semtech_loramac.h"
 
-//#include "hts221.h"
-//#include "hts221_params.h"
+#include "ds18.h"
+#include "ds18_params.h"
 
 #include "board.h"
 
 /* TODO: Add the cayenne_lpp header here */
 #include "cayenne_lpp.h"
+
+/* Declare globally the sensor device descriptor */
+#define DS18_PARAM_PIN (GPIO_PIN(1, 3))
+static ds18_t ds18;
 
 /* Declare globally the sx127x radio driver descriptor */
 static sx126x_t sx126x;
@@ -28,8 +32,12 @@ static semtech_loramac_t loramac;
 static cayenne_lpp_t lpp;
 
 /* Device and application informations required for OTAA activation */
+
+// Emeric TTN
+static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x05, 0x33};
+
 // Camille TTN
-static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
+// static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C};
 
@@ -49,6 +57,10 @@ static void sender(void)
         /* do some measurements */
         uint16_t humidity = 20;
         int16_t temperature = 0;
+
+        if (ds18_get_temperature(&ds18, &temperature) != DS18_OK) {
+            puts(" -- failed to read temperature!");
+        }
 
         /* TODO: prepare cayenne lpp payload here */
         cayenne_lpp_add_temperature(&lpp, 0, (float)temperature);
@@ -79,6 +91,10 @@ static void sender(void)
 
 int main(void)
 {
+     if (ds18_init(&ds18, &ds18_params[0]) != DS18_OK) {
+        puts("Sensor initialization failed");
+        return 1;
+    }
 
     /* initialize the radio driver */
     sx126x_setup(&sx126x, &sx126x_params[0], 0);

@@ -8,7 +8,7 @@ RIOTBASE ?= $(CURDIR)/../../RIOT
 LORA_REGION ?= EU868
 
 USEMODULE += ztimer_msec
-USEMODULE += hts221
+USEMODULE += ds18
 USEMODULE += sx126x_stm32wl
 
 USEPKG += semtech-loramac
