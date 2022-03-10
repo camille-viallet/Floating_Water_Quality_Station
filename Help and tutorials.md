@@ -15,6 +15,8 @@ Synthesis for flashing the card inspired by : https://wiki.seeedstudio.com/LoRa_
 - Check verify programming and Run after programming.
 
 Lora E5 development Board documentation : https://doc.riot-os.org/group__boards__lora-e5-dev.html
+PinOut:
+![Pinout Lora E5 mini](https://files.seeedstudio.com/products/317990687/image/3001615286723_.pic_hd.jpg)
 
 # Tutorials and sensor information
 
