@@ -18,35 +18,31 @@
 /* TODO: Add the cayenne_lpp header here */
 #include "cayenne_lpp.h"
 
-/* Declare globally the sensor device descriptor */
-#define DS18_PARAM_PIN (GPIO_PIN(1, 3))
-static ds18_t ds18;
-
 /* Declare globally the sx127x radio driver descriptor */
 static sx126x_t sx126x;
 
 /* Declare globally the loramac descriptor */
 static semtech_loramac_t loramac;
 
-/* TODO: Declare globally Cayenne LPP descriptor here */
+/* Declare globally Cayenne LPP descriptor here */
 static cayenne_lpp_t lpp;
+
+/* Declare globally the sensor DS18 descriptor */
+static ds18_t ds18;
+//Initialises the pin to which the sensor is connected
+static const ds18_params_t ds18_FW_params[] = {{.pin = (GPIO_PIN(1, 4)),
+                                                .out_mode = (GPIO_OD_PU)}};
 
 /* Device and application informations required for OTAA activation */
 
 // Emeric TTN
-static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x05, 0x33};
+//static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x05, 0x33};
 
 // Camille TTN
-// static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
+static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C};
 
-/*
-// Camille Helium
-static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x60, 0x81,0xF9,0x6C,0x47,0xF9,0xA7,0xD3};                                                 //Camille
-static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x60,0x81,0xF9,0x45,0x86,0x89,0x57,0xBB};                                                 //Camille
-static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0xB8,0x53,0xCA,0xC4,0x29,0x03,0x23,0x9F,0xDF,0x24,0x39,0x30,0x20,0x79,0x30,0xC8}; //Camille
-*/
 static void sender(void)
 {
     while (1)
@@ -58,11 +54,27 @@ static void sender(void)
         uint16_t humidity = 20;
         int16_t temperature = 0;
 
-        if (ds18_get_temperature(&ds18, &temperature) != DS18_OK) {
-            puts(" -- failed to read temperature!");
+        char str[100];
+        if (ds18_get_temperature(&ds18, &temperature) == DS18_OK)
+        {
+            bool negative = (temperature < 0);
+            if (negative)
+            {
+                temperature = -temperature;
+            }
+
+            sprintf(str, "Temperature : %c%d.%02d ºC",
+                    negative ? '-' : ' ',
+                    temperature / 100,
+                    temperature % 100);
+            puts(str);
+        }
+        else
+        {
+            puts("[Error] Could not read temperature");
         }
 
-        /* TODO: prepare cayenne lpp payload here */
+        /* Prepare cayenne lpp payload here */
         cayenne_lpp_add_temperature(&lpp, 0, (float)temperature);
         cayenne_lpp_add_relative_humidity(&lpp, 1, (float)humidity);
 
@@ -70,18 +82,18 @@ static void sender(void)
         uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
         if (ret == SEMTECH_LORAMAC_TX_DONE)
         {
-            printf("Send Data OK");
+            puts("Send Data OK");
         }
         else if (ret == SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED)
         {
-            printf("Duty Cycle Restriction");
+            puts("Duty Cycle Restriction");
         }
-        else if (ret == SEMTECH_LORAMAC_TX_ERROR )
+        else if (ret == SEMTECH_LORAMAC_TX_ERROR)
         {
-            printf("Invalid Parameter given");
+            puts("Invalid Parameter given");
         }
 
-        /* TODO: clear buffer once done here */
+        /* clear buffer once done here */
         cayenne_lpp_reset(&lpp);
     }
 
@@ -91,9 +103,10 @@ static void sender(void)
 
 int main(void)
 {
-     if (ds18_init(&ds18, &ds18_params[0]) != DS18_OK) {
-        puts("Sensor initialization failed");
-        return 1;
+    /*Initialize temperature sensor*/
+    if (ds18_init(&ds18, &ds18_FW_params[0]) != DS18_OK)
+    {
+        puts("Temperature sensor initialization failed");
     }
 
     /* initialize the radio driver */
@@ -130,12 +143,11 @@ int main(void)
     else if (state == SEMTECH_LORAMAC_JOIN_FAILED)
     {
         puts("Join Failed");
-        return 1;
     }
-    printf("end join procedure");
+    puts("end join procedure");
 
     /* call the sender function */
     sender();
-    printf("end sender");
+    puts("end sender");
     return 0;
 }
