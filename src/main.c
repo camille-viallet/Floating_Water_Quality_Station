@@ -37,37 +37,39 @@ static const ds18_params_t ds18_FW_params[] = {{.pin = (GPIO_PIN(1, 4)),
 
 // Emeric TTN
 //static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x05, 0x33};
+//
+static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0xC4, 0xD9, 0x58, 0x6D, 0x09, 0xC7, 0xB7, 0x88};
+static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
+static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x1F, 0x55, 0xCE, 0x3C, 0x45, 0x6C, 0xAB, 0x6F, 0x16, 0x49, 0x0B, 0x9D, 0xD6, 0xC7, 0xC2};
 // Camille TTN
-static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
+/*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C};
+*/
 
 static void sender(void)
 {
     while (1)
     {
         /* wait 20 secs */
-        ztimer_sleep(ZTIMER_MSEC, 20 * MS_PER_SEC);
+        //ztimer_sleep(ZTIMER_MSEC, 20 * MS_PER_SEC);
 
         /* do some measurements */
-        uint16_t humidity = 20;
+        //uint16_t humidity = 20;
         int16_t temperature = 0;
+        float temp = 0;
 
         char str[100];
+
         if (ds18_get_temperature(&ds18, &temperature) == DS18_OK)
         {
             bool negative = (temperature < 0);
             if (negative)
             {
-                temperature = -temperature;
+                temp = -temperature;
             }
-
-            sprintf(str, "Temperature : %c%d.%02d ºC",
-                    negative ? '-' : ' ',
-                    temperature / 100,
-                    temperature % 100);
-            puts(str);
+            temp = (float)temperature / 100.;
         }
         else
         {
@@ -75,14 +77,17 @@ static void sender(void)
         }
 
         /* Prepare cayenne lpp payload here */
-        cayenne_lpp_add_temperature(&lpp, 0, (float)temperature);
-        cayenne_lpp_add_relative_humidity(&lpp, 1, (float)humidity);
+        cayenne_lpp_add_temperature(&lpp, 0, temp);
+        //cayenne_lpp_add_relative_humidity(&lpp, 1, (float)humidity);
 
         /* send the LoRaWAN message */
         uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
         if (ret == SEMTECH_LORAMAC_TX_DONE)
         {
             puts("Send Data OK");
+            sprintf(str, "Temperature : %f ºC",
+                    temp);
+            puts(str);
         }
         else if (ret == SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED)
         {
@@ -135,6 +140,7 @@ int main(void)
     else if (state == SEMTECH_LORAMAC_ALREADY_JOINED)
     {
         puts("Already join");
+        return 1;
     }
     else if (state == SEMTECH_LORAMAC_BUSY)
     {
@@ -143,6 +149,7 @@ int main(void)
     else if (state == SEMTECH_LORAMAC_JOIN_FAILED)
     {
         puts("Join Failed");
+        return 1;
     }
     puts("end join procedure");
 
