@@ -38,22 +38,21 @@ static const ds18_params_t ds18_FW_params[] = {{.pin = (GPIO_PIN(1, 4)),
 // Emeric TTN
 //static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x05, 0x33};
 //
-static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0xC4, 0xD9, 0x58, 0x6D, 0x09, 0xC7, 0xB7, 0x88};
+/*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0xC4, 0xD9, 0x58, 0x6D, 0x09, 0xC7, 0xB7, 0x88};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x1F, 0x55, 0xCE, 0x3C, 0x45, 0x6C, 0xAB, 0x6F, 0x16, 0x49, 0x0B, 0x9D, 0xD6, 0xC7, 0xC2};
+*/
 // Camille TTN
-/*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
+static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C};
-*/
 
 static void sender(void)
 {
     while (1)
     {
         /* wait 20 secs */
-        //ztimer_sleep(ZTIMER_MSEC, 20 * MS_PER_SEC);
+        ztimer_sleep(ZTIMER_MSEC, 20 * MS_PER_SEC);
 
         /* do some measurements */
         //uint16_t humidity = 20;
@@ -70,6 +69,8 @@ static void sender(void)
                 temp = -temperature;
             }
             temp = (float)temperature / 100.;
+            sprintf(str, "Temperature : %f ºC", temp);
+            puts(str);
         }
         else
         {
@@ -85,9 +86,6 @@ static void sender(void)
         if (ret == SEMTECH_LORAMAC_TX_DONE)
         {
             puts("Send Data OK");
-            sprintf(str, "Temperature : %f ºC",
-                    temp);
-            puts(str);
         }
         else if (ret == SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED)
         {
