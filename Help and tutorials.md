@@ -14,6 +14,10 @@ Synthesis for flashing the card inspired by : https://wiki.seeedstudio.com/LoRa_
 - Now go to the Erasing & Programming page, and select your file path.
 - Check verify programming and Run after programming.
 
+Lora E5 development Board documentation : https://doc.riot-os.org/group__boards__lora-e5-dev.html
+PinOut:
+![Pinout Lora E5 mini](https://files.seeedstudio.com/products/317990687/image/3001615286723_.pic_hd.jpg)
+
 # Tutorials and sensor information
 
 Sample code for the use of the turbidity sensor : https://wiki.dfrobot.com/Turbidity_sensor_SKU__SEN0189
