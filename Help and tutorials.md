@@ -21,6 +21,7 @@ PinOut:
 # Tutorials and sensor information
 
 Sample code for the use of the turbidity sensor : https://wiki.dfrobot.com/Turbidity_sensor_SKU__SEN0189
+https://wiki.seeedstudio.com/Grove-Turbidity-Sensor-Meter-for-Arduino-V1.0/
 
 Help and documentation for water quality measurement : https://gitlab.com/stm32python/fr-version-lora/-/blob/master/site/_riot_tuto/sensors.md#mesure-de-la-qualit%C3%A9-de-leau
 
