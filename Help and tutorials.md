@@ -86,10 +86,17 @@ Code base, existing project of altitude probe : https://github.com/CampusIoT/orb
 
 Cayenne : https://github.com/RIOT-OS/RIOT/tree/master/pkg/cayenne-lpp
 
-# Help with building the raft
+## Help with building the raft
 
 Example of a raft similar to the one to be built: https://nevonprojects.com/iot-water-pollution-monitor-rc-boat/
 
-# Creation of new drivers for RIOT os
+## Creation of new drivers for RIOT os
 
 https://github-wiki-see.page/m/RIOT-OS/RIOT/wiki/Guide%3A-Writing-a-device-driver-in-RIOT
+
+## Creation and use of a new program
+
+1. Write the code that you want in a file using C. Put it in a directory with the Makefile.
+2. Compile with the command `make BOARD=lora-e5-dev LORA_DRIVER=sx126x_stm32wl REGION=EU433`
+3. Start STM32CubeProgrammer and connect the card (see Connecting the card)
+4. Start your program by pushing the RST button on your LoRa card.
