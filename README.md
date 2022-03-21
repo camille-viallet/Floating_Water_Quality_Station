@@ -7,3 +7,9 @@ Connection of the DS18 temperature sensor to the LoraE5 board:
 - Black wire: GND
 - Yellow wire: D0
 - White wire: not used
+
+### Turbidity sensor connection
+Connection of the turbidity sensor to the LoraE5 board:
+- Red wire: 5V
+- Black wire: GND
+- Blue : PB4
