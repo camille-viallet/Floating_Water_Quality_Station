@@ -5,5 +5,5 @@ Overview of data obtain by the sensors : https://cayenne.mydevices.com/shared/62
 Connection of the DS18 temperature sensor to the LoraE5 board:
 - Red wire: 3V3
 - Black wire: GND
-- Yellow wire: A4
+- Yellow wire: D0
 - White wire: not used

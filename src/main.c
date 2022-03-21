@@ -29,9 +29,6 @@ static cayenne_lpp_t lpp;
 
 /* Declare globally the sensor DS18 descriptor */
 static ds18_t ds18;
-//Initialises the pin to which the sensor is connected
-static const ds18_params_t ds18_FW_params[] = {{.pin = (GPIO_PIN(1, 4)),
-                                                .out_mode = (GPIO_OD_PU)}};
 
 /* Device and application informations required for OTAA activation */
 
@@ -40,17 +37,18 @@ static const ds18_params_t ds18_FW_params[] = {{.pin = (GPIO_PIN(1, 4)),
 //
 /*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0xC4, 0xD9, 0x58, 0x6D, 0x09, 0xC7, 0xB7, 0x88};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x1F, 0x55, 0xCE, 0x3C, 0x45, 0x6C, 0xAB, 0x6F, 0x16, 0x49, 0x0B, 0x9D, 0xD6, 0xC7, 0xC2};
+static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x1F, 0x55, 0xCE, 0x3C, 0x45, 0x6C, 0xAB, 0x6F, 0x16, 0x49, 0x0B, 0x9D, 0xC9, 0xD6, 0xC7, 0xC2};
 */
 // Camille TTN
-// static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
-// static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
-// static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C};
+static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
+static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
+static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C};
 
 // Emeric Chirpstack
-static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2c, 0xf7, 0xf1, 0x20, 0x24, 0x90, 0x05, 0x33};
+/*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2c, 0xf7, 0xf1, 0x20, 0x24, 0x90, 0x05, 0x33};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x54, 0x70, 0x68, 0xC7, 0xBB, 0x7F, 0xE1, 0x78, 0xF2, 0x6E, 0x4B, 0x53, 0x80, 0xF1, 0x7F, 0xD1};
+*/
 
 static void sender(void)
 {
@@ -74,7 +72,10 @@ static void sender(void)
                 temp = -temperature;
             }
             temp = (float)temperature / 100.;
-            sprintf(str, "Temperature : %f ºC", temp);
+            sprintf(str, "Temperature : %c%d.%02d ºC",
+                    negative ? '-' : ' ',
+                    temperature / 100,
+                    temperature % 100);
             puts(str);
         }
         else
@@ -112,7 +113,7 @@ static void sender(void)
 int main(void)
 {
     /*Initialize temperature sensor*/
-    if (ds18_init(&ds18, &ds18_FW_params[0]) != DS18_OK)
+    if (ds18_init(&ds18, &ds18_params[0]) != DS18_OK)
     {
         puts("Temperature sensor initialization failed");
     }
@@ -152,6 +153,11 @@ int main(void)
     else if (state == SEMTECH_LORAMAC_JOIN_FAILED)
     {
         puts("Join Failed");
+        return 1;
+    }
+    else
+    {
+        puts("Error on the join procedure");
         return 1;
     }
     puts("end join procedure");
