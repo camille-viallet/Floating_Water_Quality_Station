@@ -15,5 +15,6 @@
 
 int pHInit(void);
 double getpH(void);
+void printpH(void);
 
 #endif /*PH_H*/

@@ -14,6 +14,7 @@
 #include "ds18_params.h"
 
 #include "turbidity.h"
+#include "pH.h"
 
 #include "board.h"
 
@@ -89,7 +90,14 @@ static void sender(void)
 
         // Get the turbidity value and convert it in Cayenne format
         double turbidity = getTurbidity();
+        printTurbidity();
         cayenne_lpp_add_analog_input(&lpp, 1, turbidity);
+
+        // Get the pH value and convert it in Cayenne format
+        double pH = getpH();
+        printpH();
+        cayenne_lpp_add_analog_input(&lpp, 2, pH);
+
 
         /* send the LoRaWAN message */
         uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);

@@ -3,6 +3,7 @@
 /**
  * Measure the pH value with the sensor SEN0169 : https://wiki.dfrobot.com/Turbidity_sensor_SKU__SEN0189
  **/
+double turbidity = 0.;
 
 int turbidityInit(void)
 {
@@ -19,9 +20,18 @@ double getTurbidity(void)
     else
     {
         double value = (double)sample * 5.0 / 4096.0;
-        double equation = -1120.4 * pow(value, 2.0) + 5742.3 * value - 4352.9;
-        puts("turbidity value : %f\n", equation);
-        return equation;
+        turbidity = -1120.4 * pow(value, 2.0) + 5742.3 * value - 4352.9;
+        return turbidity;
     }
     return -1;
+}
+
+void printTurbidity(void)
+{
+    char str[20];
+    int tur = (int)(turbidity * 100);
+    sprintf(str, "pH : %d.%02d ºC",
+            tur / 100,
+            tur % 100);
+    puts(str);
 }

@@ -2,6 +2,7 @@
 /**
  * Measure the pH value with the sensor SEN0169 : https://wiki.dfrobot.com/Analog_pH_Meter_Pro_SKU_SEN0169
  **/
+double pH = 0.;
 
 int pHInit(void)
 {
@@ -18,9 +19,18 @@ double getpH(void)
     else
     {
         double value = ((double)sample * 5.0 / 4096.0) * 1000;
-        double equation = -(value / 59.16 - 7);
-        puts("pH value : %f\n", equation);
-        return equation;
+        pH = -(value / 59.16 - 7);
+        return pH;
     }
     return -1;
+}
+
+void printpH(void)
+{
+    char str[20];
+    int ph = (int)(pH*100);
+    sprintf(str, "pH : %d.%02d ºC",
+            ph / 100,
+            ph % 100);
+    puts(str);
 }
