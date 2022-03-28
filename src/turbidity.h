@@ -14,7 +14,7 @@
  **/
 
 int turbidityInit(void);
-double getTurbidity(void);
+float getTurbidity(void);
 void printTurbidity(void);
 
 #endif /*TURBIDITY_H*/
