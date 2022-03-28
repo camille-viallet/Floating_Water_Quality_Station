@@ -38,14 +38,15 @@ static ds18_t ds18;
 // Emeric TTN
 //static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x05, 0x33};
 //
-/*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0xC4, 0xD9, 0x58, 0x6D, 0x09, 0xC7, 0xB7, 0x88};
+static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0xC4, 0xD9, 0x58, 0x6D, 0x09, 0xC7, 0xB7, 0x88};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x1F, 0x55, 0xCE, 0x3C, 0x45, 0x6C, 0xAB, 0x6F, 0x16, 0x49, 0x0B, 0x9D, 0xC9, 0xD6, 0xC7, 0xC2};
-*/
+
 // Camille TTN
-static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
+/*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x00, 0xBE};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C};
+*/
 
 // Emeric Chirpstack
 /*static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2c, 0xf7, 0xf1, 0x20, 0x24, 0x90, 0x05, 0x33};
@@ -64,7 +65,7 @@ static void sender(void)
         int16_t temperature = 0;
         float temp = 0;
 
-        char str[100];
+        //char str[100];
 
         if (ds18_get_temperature(&ds18, &temperature) == DS18_OK)
         {
@@ -74,11 +75,12 @@ static void sender(void)
                 temp = -temperature;
             }
             temp = (float)temperature / 100.;
-            sprintf(str, "Temperature : %c%d.%02d ºC",
+           /* sprintf(str, "Temperature : %c%d.%02d ºC",
                     negative ? '-' : ' ',
                     temperature / 100,
                     temperature % 100);
-            puts(str);
+            puts(str);*/
+            printf("Temperature : %f °C\n", temp);
         }
         else
         {
@@ -100,7 +102,7 @@ static void sender(void)
 
 
         /* send the LoRaWAN message */
-        uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
+       /* uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
         if (ret == SEMTECH_LORAMAC_TX_DONE)
         {
             puts("Send Data OK");
@@ -112,7 +114,7 @@ static void sender(void)
         else if (ret == SEMTECH_LORAMAC_TX_ERROR)
         {
             puts("Invalid Parameter given");
-        }
+        }*/
 
         /* clear buffer once done here */
         cayenne_lpp_reset(&lpp);
@@ -128,6 +130,11 @@ int main(void)
     if (turbidityInit() < 0)
     {
         puts("Turbidity sensor initialization failed");
+    }
+      /*Initialize turbidity sensor*/
+    if (pHInit() < 0)
+    {
+        puts("pH sensor initialization failed");
     }
     /*Initialize temperature sensor*/
     if (ds18_init(&ds18, &ds18_params[0]) != DS18_OK)
@@ -151,7 +158,7 @@ int main(void)
 
     /* start the OTAA join procedure */
     puts("Starting join procedure");
-    uint8_t state = semtech_loramac_join(&loramac, LORAMAC_JOIN_OTAA);
+    /*uint8_t state = semtech_loramac_join(&loramac, LORAMAC_JOIN_OTAA);
     if (state == SEMTECH_LORAMAC_JOIN_SUCCEEDED)
     {
         puts("Join procedure succeeded");
@@ -175,7 +182,7 @@ int main(void)
         puts("Error on the join procedure");
         return 1;
     }
-    puts("end join procedure");
+    puts("end join procedure");*/
 
     /* call the sender function */
     sender();
