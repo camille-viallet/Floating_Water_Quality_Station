@@ -12,6 +12,7 @@ USEMODULE += ztimer
 USEMODULE += ztimer_msec
 USEMODULE += ds18
 USEMODULE += sx126x_stm32wl
+USEMODULE += printf_float
 
 USEPKG += semtech-loramac
 USEPKG += cayenne-lpp
