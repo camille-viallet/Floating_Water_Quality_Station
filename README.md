@@ -3,7 +3,7 @@ Overview of data obtain by the sensors : https://cayenne.mydevices.com/shared/62
 
 ### Temperature sensor connection
 Connection of the DS18 temperature sensor to the LoraE5 board:
-- Red wire: 3V3
+- Red wire: 5V
 - Black wire: GND
 - Yellow wire: D0
 - White wire: not used
@@ -12,4 +12,17 @@ Connection of the DS18 temperature sensor to the LoraE5 board:
 Connection of the turbidity sensor to the LoraE5 board:
 - Red wire: 5V
 - Black wire: GND
-- Blue : PB3
+- Blue : A3
+
+### Temperature sensor connection
+Connection of the DS18 temperature sensor to the LoraE5 board:
+- Red wire: 5V
+- Black wire: GND
+- Yellow wire: D0
+- White wire: not used
+
+### pH sensor connection
+Connection of the turbidity sensor to the LoraE5 board:
+- **Red wire: GND**
+- **Black wire: 5V**
+- Blue : A4
