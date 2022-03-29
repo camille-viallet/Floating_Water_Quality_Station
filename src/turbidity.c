@@ -5,6 +5,7 @@
  **/
 float turbidity = 0.;
 float value = 0.;
+float offset = 0.7887;
 
 int turbidityInit(void)
 {
@@ -13,16 +14,16 @@ int turbidityInit(void)
 
 float getTurbidity(void)
 {
-    int sample = adc_sample(ADC_LINE(0), RES);
-    printf ( "sample %d\n", sample);
+    int32_t sample = adc_sample(ADC_LINE(0), RES);
+
     if (sample < 0)
     {
         puts("turbidity : ADC_LINE(0): selected resolution not applicable\n");
     }
     else
     {
-        //value = (double)sample * 5.0 / 2946.0;
-        //value = (double)sample * 5.0 / 4096.0;
+        printf("sample %ld\n", sample);
+        value = (float)sample * 5.0 / 4095.0 - offset;
         if (value < 2.5)
         {
             turbidity = 3000;
@@ -30,6 +31,10 @@ float getTurbidity(void)
         else
         {
             turbidity = -1120.4 * pow(value, 2.0) + 5742.3 * value - 4352.9;
+        }
+        if (turbidity < 0)
+        {
+            turbidity = 0;
         }
         return turbidity;
     }
