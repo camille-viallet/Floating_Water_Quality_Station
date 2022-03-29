@@ -75,11 +75,6 @@ static void sender(void)
                 temp = -temperature;
             }
             temp = (float)temperature / 100.;
-           /* sprintf(str, "Temperature : %c%d.%02d ºC",
-                    negative ? '-' : ' ',
-                    temperature / 100,
-                    temperature % 100);
-            puts(str);*/
             printf("Temperature : %f °C\n", temp);
         }
         else
