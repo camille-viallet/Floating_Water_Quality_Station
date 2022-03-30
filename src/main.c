@@ -1,3 +1,5 @@
+/* Declare all the necessary header for this program */
+
 #include <string.h>
 
 #include "timex.h"
@@ -18,26 +20,23 @@
 
 #include "board.h"
 
-/* Add the cayenne_lpp header here */
 #include "cayenne_lpp.h"
 
-/* Declare globally the sx127x radio driver descriptor */
+/* Declare globally the sx126x radio driver descriptor */
 static sx126x_t sx126x;
 
 /* Declare globally the loramac descriptor */
 static semtech_loramac_t loramac;
 
-/* Declare globally Cayenne LPP descriptor here */
+/* Declare globally Cayenne LPP descriptor */
 static cayenne_lpp_t lpp;
 
 /* Declare globally the sensor DS18 descriptor */
 static ds18_t ds18;
 
-/* Device and application informations required for OTAA activation */
+/* Device and application informations required for OTAA activation, uncomment the lines related to your board and the network application you're using */
 
 // Emeric TTN
-//static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0x2C, 0xF7, 0xF1, 0x20, 0x24, 0x90, 0x05, 0x33};
-//
 static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = {0xC4, 0xD9, 0x58, 0x6D, 0x09, 0xC7, 0xB7, 0x88};
 static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x1F, 0x55, 0xCE, 0x3C, 0x45, 0x6C, 0xAB, 0x6F, 0x16, 0x49, 0x0B, 0x9D, 0xC9, 0xD6, 0xC7, 0xC2};
@@ -54,50 +53,49 @@ static const uint8_t appeui[LORAMAC_APPEUI_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00,
 static const uint8_t appkey[LORAMAC_APPKEY_LEN] = {0x54, 0x70, 0x68, 0xC7, 0xBB, 0x7F, 0xE1, 0x78, 0xF2, 0x6E, 0x4B, 0x53, 0x80, 0xF1, 0x7F, 0xD1};
 */
 
+// Function used to get data from sensors and send them to the antenna
 static void sender(void)
 {
     while (1)
     {
-        /* wait 20 secs */
+        /* wait 20 secs to avoid overload of messages */
         ztimer_sleep(ZTIMER_MSEC, 20 * MS_PER_SEC);
 
-        // Get the temperature value and convert it in Cayenne format
+        /* Declare the variable temperature */
         int16_t temperature = 0;
         float temp = 0;
 
-        //char str[100];
+        char str[100];
 
+        /* We are using the function which is getting the data from the temperature sensor */
         if (ds18_get_temperature(&ds18, &temperature) == DS18_OK)
         {
-            bool negative = (temperature < 0);
-            if (negative)
-            {
-                temp = -temperature;
-            }
-            temp = (float)temperature / 100.;
+            temp = (float)temperature / 100.; // We need to divide the value to obtain the temperature in Celsius degrees
             printf("Temperature : %f °C\n", temp);
         }
-        else
+        else // If there is no data, it returns the following error message
         {
             puts("[Error] Could not read temperature");
         }
 
-        /// Prepare cayenne lpp payload here
+        /* Prepare cayenne lpp payload and add the temperature value to the Cayenne LPP descriptor */
         cayenne_lpp_add_temperature(&lpp, 0, temp);
 
-        // Get the turbidity value and convert it in Cayenne format
+        /* Get the turbidity value, convert it in Cayenne format and add it to the Cayenne LPP descriptor */
         double turbidity = getTurbidity();
         printTurbidity();
         cayenne_lpp_add_analog_input(&lpp, 1, turbidity);
 
-        // Get the pH value and convert it in Cayenne format
+        /* Get the pH value, convert it in Cayenne format and add it to the Cayenne LPP descriptor */
         double pH = getpH();
         printpH();
         cayenne_lpp_add_analog_input(&lpp, 2, pH);
 
 
-        /* send the LoRaWAN message */
-       /* uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
+        /* send the LoRaWAN message, with all the information that the Cayenne LPP descriptor contain */
+        uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
+
+        /* Depending on how it has been sent, the message in the console will be different */
         if (ret == SEMTECH_LORAMAC_TX_DONE)
         {
             puts("Send Data OK");
@@ -109,7 +107,7 @@ static void sender(void)
         else if (ret == SEMTECH_LORAMAC_TX_ERROR)
         {
             puts("Invalid Parameter given");
-        }*/
+        }
 
         /* clear buffer once done here */
         cayenne_lpp_reset(&lpp);
@@ -121,21 +119,21 @@ static void sender(void)
 
 int main(void)
 {
-    /*Initialize turbidity sensor*/
+    /*Initialize turbidity sensor : if it fails, return an error message */
     if (turbidityInit() < 0)
     {
         puts("Turbidity sensor initialization failed");
     }
-      /*Initialize turbidity sensor*/
+      /*Initialize pH sensor : if it fails, return an error message */
     if (pHInit() < 0)
     {
         puts("pH sensor initialization failed");
     }
-    /*Initialize temperature sensor*/
+    /*Initialize temperature sensor : if it fails, return an error message */
     if (ds18_init(&ds18, &ds18_params[0]) != DS18_OK)
         puts("Temperature sensor initialization failed");
 
-    /* initialize the radio driver */
+    /* initialize the radio driver : the parameters and the netdev are all declared in their classes in the RIOT directory */
     sx126x_setup(&sx126x, &sx126x_params[0], 0);
     loramac.netdev = &sx126x.netdev;
     loramac.netdev->driver = &sx126x_driver;
@@ -146,14 +144,16 @@ int main(void)
     /* use a fast datarate so we don't use the physical layer too much */
     semtech_loramac_set_dr(&loramac, 5);
 
-    /* set the LoRaWAN keys */
+    /* set the LoRaWAN keys : it's important that these keys are the same as the one in the network server that you're using */
     semtech_loramac_set_deveui(&loramac, deveui);
     semtech_loramac_set_appeui(&loramac, appeui);
     semtech_loramac_set_appkey(&loramac, appkey);
 
     /* start the OTAA join procedure */
     puts("Starting join procedure");
-    /*uint8_t state = semtech_loramac_join(&loramac, LORAMAC_JOIN_OTAA);
+    uint8_t state = semtech_loramac_join(&loramac, LORAMAC_JOIN_OTAA);
+
+    /* Depending on how the join procedure is working, it will return a success message or an error message */
     if (state == SEMTECH_LORAMAC_JOIN_SUCCEEDED)
     {
         puts("Join procedure succeeded");
@@ -177,7 +177,7 @@ int main(void)
         puts("Error on the join procedure");
         return 1;
     }
-    puts("end join procedure");*/
+    puts("end join procedure");
 
     /* call the sender function */
     sender();
