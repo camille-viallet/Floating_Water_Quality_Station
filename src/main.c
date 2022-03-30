@@ -12,11 +12,12 @@
 #include "net/loramac.h"
 #include "semtech_loramac.h"
 
-#include "ds18.h"
-#include "ds18_params.h"
+// #include "ds18.h"
+// #include "ds18_params.h"
 
-#include "turbidity.h"
-#include "pH.h"
+// #include "turbidity.h"
+// #include "pH.h"
+#include "sensors.h"
 
 #include "board.h"
 
@@ -32,7 +33,7 @@ static semtech_loramac_t loramac;
 static cayenne_lpp_t lpp;
 
 /* Declare globally the sensor DS18 descriptor */
-static ds18_t ds18;
+// static ds18_t ds18;
 
 /* Device and application informations required for OTAA activation, uncomment the lines related to your board and the network application you're using */
 
@@ -61,36 +62,35 @@ static void sender(void)
         /* wait 20 secs to avoid overload of messages */
         ztimer_sleep(ZTIMER_MSEC, 20 * MS_PER_SEC);
 
-        /* Declare the variable temperature */
-        int16_t temperature = 0;
-        float temp = 0;
+        // /* Declare the variable temperature */
+        // int16_t temperature = 0;
+        // float temp = 0;
 
-        char str[100];
+        // /* We are using the function which is getting the data from the temperature sensor */
+        // if (ds18_get_temperature(&ds18, &temperature) == DS18_OK)
+        // {
+        //     temp = (float)temperature / 100.; // We need to divide the value to obtain the temperature in Celsius degrees
+        //     printf("Temperature : %f °C\n", temp);
+        // }
+        // else // If there is no data, it returns the following error message
+        // {
+        //     puts("[Error] Could not read temperature");
+        // }
 
-        /* We are using the function which is getting the data from the temperature sensor */
-        if (ds18_get_temperature(&ds18, &temperature) == DS18_OK)
-        {
-            temp = (float)temperature / 100.; // We need to divide the value to obtain the temperature in Celsius degrees
-            printf("Temperature : %f °C\n", temp);
-        }
-        else // If there is no data, it returns the following error message
-        {
-            puts("[Error] Could not read temperature");
-        }
+        // /* Prepare cayenne lpp payload and add the temperature value to the Cayenne LPP descriptor */
+        // cayenne_lpp_add_temperature(&lpp, 0, temp);
 
-        /* Prepare cayenne lpp payload and add the temperature value to the Cayenne LPP descriptor */
-        cayenne_lpp_add_temperature(&lpp, 0, temp);
+        // /* Get the turbidity value, convert it in Cayenne format and add it to the Cayenne LPP descriptor */
+        // double turbidity = getTurbidity();
+        // printTurbidity();
+        // cayenne_lpp_add_analog_input(&lpp, 1, turbidity);
 
-        /* Get the turbidity value, convert it in Cayenne format and add it to the Cayenne LPP descriptor */
-        double turbidity = getTurbidity();
-        printTurbidity();
-        cayenne_lpp_add_analog_input(&lpp, 1, turbidity);
+        // /* Get the pH value, convert it in Cayenne format and add it to the Cayenne LPP descriptor */
+        // double pH = getpH();
+        // printpH();
+        // cayenne_lpp_add_analog_input(&lpp, 2, pH);
 
-        /* Get the pH value, convert it in Cayenne format and add it to the Cayenne LPP descriptor */
-        double pH = getpH();
-        printpH();
-        cayenne_lpp_add_analog_input(&lpp, 2, pH);
-
+        getSensors(&lpp);
 
         /* send the LoRaWAN message, with all the information that the Cayenne LPP descriptor contain */
         uint8_t ret = semtech_loramac_send(&loramac, lpp.buffer, lpp.cursor);
@@ -119,19 +119,21 @@ static void sender(void)
 
 int main(void)
 {
-    /*Initialize turbidity sensor : if it fails, return an error message */
-    if (turbidityInit() < 0)
-    {
-        puts("Turbidity sensor initialization failed");
-    }
-      /*Initialize pH sensor : if it fails, return an error message */
-    if (pHInit() < 0)
-    {
-        puts("pH sensor initialization failed");
-    }
-    /*Initialize temperature sensor : if it fails, return an error message */
-    if (ds18_init(&ds18, &ds18_params[0]) != DS18_OK)
-        puts("Temperature sensor initialization failed");
+    // /*Initialize turbidity sensor : if it fails, return an error message */
+    // if (turbidityInit() < 0)
+    // {
+    //     puts("Turbidity sensor initialization failed");
+    // }
+    //   /*Initialize pH sensor : if it fails, return an error message */
+    // if (pHInit() < 0)
+    // {
+    //     puts("pH sensor initialization failed");
+    // }
+    // /*Initialize temperature sensor : if it fails, return an error message */
+    // if (ds18_init(&ds18, &ds18_params[0]) != DS18_OK)
+    //     puts("Temperature sensor initialization failed");
+
+    sensorsInit();
 
     /* initialize the radio driver : the parameters and the netdev are all declared in their classes in the RIOT directory */
     sx126x_setup(&sx126x, &sx126x_params[0], 0);

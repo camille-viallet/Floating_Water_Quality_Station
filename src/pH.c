@@ -4,7 +4,7 @@
  * Measure the pH value with the sensor SEN0169 : https://wiki.dfrobot.com/Analog_pH_Meter_Pro_SKU_SEN0169
  **/
 
-float pH = 0.;
+// float pH = 0.;
 float tension = 0.;
 
 int pHInit(void)
@@ -22,13 +22,13 @@ float getpH(void)
     else // otherwise, we are calculating the real turbidity value
     {
         tension = (sample * 5.0 / 4095.0); // we get the voltage (the value returned by the sensor are between 0 and 4096)
-        pH = 14-(3.5 * tension) + Offset;
+        float pH = 14-(3.5 * tension) + Offset;
         return pH;
     }
     return -1;
 }
 
-void printpH(void)
+void printpH(double pH)
 {
     printf("pH : %f, Tension : %f V \n", pH, tension);
 }

@@ -3,7 +3,7 @@
 /**
  * Measure the turbidity value with the sensor SEN0169 : https://wiki.dfrobot.com/Turbidity_sensor_SKU__SEN0189
  **/
-float turbidity = 0.;
+// float turbidity = 0.;
 float value = 0.;
 float offset = 0.7887; // the offset was chosen because of the method that we are using here
 
@@ -24,6 +24,7 @@ float getTurbidity(void)
     {
         printf("sample %ld\n", sample);
         value = (float)sample * 5.0 / 4095.0 - offset; // we get the voltage (the value returned by the sensor are between 0 and 4096)
+        float turbidity = 0.;
         if (value < 2.5) // If the voltage is under 2.5, the turbidity is still at 3000 (which is its higher value)
         {
             turbidity = 3000;
@@ -41,7 +42,7 @@ float getTurbidity(void)
     return -1;
 }
 
-void printTurbidity(void)
+void printTurbidity(double turbidity)
 {
     printf("Turbidity : %f NTU , Tension  : %f V\n", turbidity, value);
 }
