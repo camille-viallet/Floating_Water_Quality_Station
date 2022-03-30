@@ -26,3 +26,5 @@ Connection of the turbidity sensor to the LoraE5 board:
 - **Red wire: GND**
 - **Black wire: 5V**
 - Blue : A4
+
+![Schematic](./img/schematic.png)
