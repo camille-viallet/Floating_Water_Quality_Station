@@ -4,7 +4,6 @@
  * Measure the pH value with the sensor SEN0169 : https://wiki.dfrobot.com/Analog_pH_Meter_Pro_SKU_SEN0169
  **/
 
-// float pH = 0.;
 float tension = 0.;
 
 int pHInit(void)

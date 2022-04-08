@@ -3,7 +3,6 @@
 /**
  * Measure the turbidity value with the sensor SEN0169 : https://wiki.dfrobot.com/Turbidity_sensor_SKU__SEN0189
  **/
-// float turbidity = 0.;
 float value = 0.;
 float offset = 0.7887; // the offset was chosen because of the method that we are using here
 
