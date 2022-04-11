@@ -52,7 +52,7 @@ void addSensorsToCayenne(cayenne_lpp_t *lpp) {
     cayenne_lpp_add_temperature(lpp, 0, temp);
 
     /* Convert the turbidity value in Cayenne format and add it to the Cayenne LPP descriptor */ 
-    cayenne_lpp_add_analog_input(lpp, 1, turbidity);
+    cayenne_lpp_add_temperature(lpp, 1, turbidity); //addTemperature allows not to truncate the value, with analog the value is truncated and becomes negative
 
     /* Convert the pH value in Cayenne format and add it to the Cayenne LPP descriptor */
     cayenne_lpp_add_analog_input(lpp, 2, pH);
