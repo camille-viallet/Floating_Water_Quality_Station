@@ -3,7 +3,7 @@ Synthesis for flashing the card inspired by : https://wiki.seeedstudio.com/LoRa_
 # Connecting the card 
 - Make the following connection and then connect the two cards to the PC:
 
-![Branchement carte](./img/Cablage.png)
+![Branchement carte](https://gricad-gitlab.univ-grenoble-alpes.fr/Projets-INFO4/21-22/10/docs/-/raw/main/img/Cablage.png)
 
 - Open STM32CubeProgrammer, connect **ST-LINK** (not UART) to your PC
 - hold RESET on the LORA card
