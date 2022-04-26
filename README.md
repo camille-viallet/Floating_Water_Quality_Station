@@ -39,7 +39,7 @@ Connection of the turbidity sensor to the LoraE5 board:
 - **Black wire: 5V**
 - Blue : A4
 
-![Schematic](./img/schematic.png)
+![Schematic](https://gricad-gitlab.univ-grenoble-alpes.fr/Projets-INFO4/21-22/10/docs/-/raw/main/img/schematic.png)
 
 ## Compile the program : 
 You need to run the following make command: `make BOARD=lora-e5-dev LORA_DRIVER=sx126x_stm32wl REGION=EU433`    
